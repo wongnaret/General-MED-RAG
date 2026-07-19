@@ -19,6 +19,94 @@ The system is fully optimized for **on-premises deployment on Linux/WSL**, enabl
 
 ---
 
+## 🏗️ Architecture Design & System Flow
+
+The system architecture is structured to support **Dynamic Python Path Injection & Environment Overriding** to fully reuse the original paper's research submodule without codebase duplication.
+
+```mermaid
+graph TD
+    Client[React + Vite Web UI] <==>|1. REST API / SSE| Backend[FastAPI Server]
+    
+    %% Ingestion Pipeline
+    subgraph Knowledge Ingestion Component
+        Upload[File Upload: Bottom / Middle / Top Layer] -->|Raw File| Parser[PyMuPDF Text Extractor]
+        Parser -->|Offline Scanned Fallback| OCR[EasyOCR Offline Engine]
+        OCR -->|Extracted Text| GraphBuilder[src/graph/builder.py Wrapper]
+        GraphBuilder -->|Invoke Submodule| Extractor[creat_metagraph_with_description]
+        Extractor -->|CAMEL Agents & nano_graphrag Prompts| Neo4j[(Neo4j Graph Database)]
+        GraphBuilder -->|Cross-Layer Trinity Linkage| Linker[ref_link Cosine Linker]
+        Linker -->|Create :REFERENCE relations| Neo4j
+    end
+
+    %% RAG Retrieval Pipeline
+    subgraph U-Retrieval RAG Component
+        Backend -->|2. RAG Query| Search[src/retrieval/search.py Wrapper]
+        Search -->|3. Match Best GID| Retrieve[seq_ret Summaries Scorer]
+        Retrieve <-->|Query Summary Cosine Rating| Neo4j
+        Search -->|4. Multi-Step Evidence Retrieval| Context[ret_context & link_context]
+        Context <-->|Traverse Bottom/Middle/Top Levels| Neo4j
+        Search -->|5. Grounded Answer Generation| SubAnswering[get_response Submodule Query]
+    end
+
+    %% Unified LLM Interceptor Routing
+    subgraph Unified LLM Interceptor & Routing
+        Backend -.->|Sets Environment Config| Env[os.environ: OPENAI_API_BASE_URL & KEY]
+        Extractor -.->|6. OpenAI Completion Calls| Env
+        Retrieve -.->|6. OpenAI Completion Calls| Env
+        SubAnswering -.->|6. OpenAI Completion Calls| Env
+        Env -->|Redirect Calls to Active Provider| OpenAIClient[OpenAI & AsyncOpenAI Clients]
+        OpenAIClient -->|Local Route| LocalLLM[Ollama / vLLM Server]
+        OpenAIClient -->|Frontier Route| Gemini[Google Gemini API / OpenAI API]
+    end
+```
+
+### Clarifications on Key Components
+
+#### 1. How does LLM Routing connect to RAG?
+The `Medical-Graph-RAG` submodule relies heavily on `OpenAI` and `AsyncOpenAI` API clients inside its internal retrieval modules (`retrieve.py`, `utils.py`, `summerize.py`) to summarize queries, score document summaries (`seq_ret`), and generate the final citation-grounded response. 
+Instead of rewriting the submodule's Python code, the **LLM Routing Layer** intercepts these calls by dynamically setting `os.environ["OPENAI_API_BASE_URL"]` and `os.environ["OPENAI_API_KEY"]` inside FastAPI. Thus, when the RAG engine issues a completion request, it is automatically routed to our active local LLM (Ollama, vLLM) or frontier LLM (Gemini's OpenAI compatibility layer) without any codebase modifications!
+
+#### 2. Where is the Knowledge Ingestion Component?
+The **Knowledge Ingestion Component** is fully integrated within our FastAPI server and bridges the document parser with the submodule graph builders:
+1. **User Uploads File** (PDF/EPUB/TXT) along with a designated **Layer** (Bottom: Dictionary, Middle: Guideline, Top: Case Report) from the React UI.
+2. **Text Extractor** (`src/ingestion/parser.py`) runs PyMuPDF to extract text, falling back to an on-premises EasyOCR engine if the PDF contains scanned pages.
+3. **Graph Builder** (`src/graph/builder.py`) acts as the orchestration gateway. It registers the document with a unique `gid` and invokes the submodule's `creat_metagraph_with_description` to extract entities/relationships using CAMEL agents.
+4. **Trinity Linker**: The builder then triggers the cross-layer similarity linker (`ref_link`) to automatically bind related nodes across different layers (e.g., matching a patient symptom on the Top Layer with clinical definitions on the Bottom Layer).
+
+---
+
+## 🧬 Technical Specifications & Integration Details
+
+### 1. Dynamic Python Path Injection
+To import local bundled submodule libraries (`camel` and `nano_graphrag`) without complex installations, we append `external/Medical-Graph-RAG` to `sys.path` inside our FastAPI server before importing submodule modules:
+```python
+import sys
+import os
+submodule_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../external/Medical-Graph-RAG"))
+if submodule_path not in sys.path:
+    sys.path.append(submodule_path)
+```
+
+### 2. OpenAI API Client Overriding
+To route all submodule `OpenAI` and `AsyncOpenAI` client calls to local LLMs (Ollama/vLLM) or Frontier APIs (Gemini/OpenAI), we override the `OPENAI_API_BASE_URL` and `OPENAI_API_KEY` dynamically in `os.environ` based on the selected `LLM_PROVIDER`:
+*   **Ollama**: `http://host.docker.internal:11434/v1`
+*   **vLLM**: Customer-provided endpoint
+*   **Gemini**: `https://generativelanguage.googleapis.com/v1beta/openai/` (with API Key)
+*   **OpenAI**: `https://api.openai.com/v1`
+
+### 3. Selective 3-Layer (Trinity) Ingestion Management
+We extend our FastAPI ingestion backend and React interface to let the user select the target **Trinity Layer**:
+*   **Bottom Level**: Medical Dictionaries (MeSH terms, official definitions).
+*   **Middle Level**: Clinical guidelines, textbooks, and standards.
+*   **Top Level**: Case reports and patient documents.
+
+When files are uploaded, we reuse `creat_metagraph_with_description` to extract entities, and call `ref_link` to build secure `[:REFERENCE]` associations across levels!
+
+### 4. Graph Similarity Computing (GDS Plugin)
+We update `NEO4J_PLUGINS` in `docker-compose.yml` to include `gds` (Graph Data Science) along with `apoc`. This supports `gds.similarity.cosine(...)` natively for node-merging queries inside the submodule without any modification!
+
+---
+
 ## 📁 Repository Structure
 
 ```
@@ -33,9 +121,9 @@ General-MED-RAG/
 ├── src/                        # FastAPI Backend Server code
 │   ├── config.py               # Environments and configurations
 │   ├── api/main.py             # FastAPI entrypoint and REST endpoints
-│   ├── ingestion/parser.py     # Offline PDF parser + EasyOCR + Semantic Chunker
+│   ├── ingestion/parser.py     # Offline PDF parser + EasyOCR + Chunker
 │   ├── db/                     # Database connectors (Neo4j, Qdrant)
-│   ├── graph/builder.py        # Trinity Graph Constructor
+│   ├── graph/builder.py        # Trinity Graph Constructor Wrapper
 │   └── llm/client.py           # Unified model router (Ollama / vLLM / Gemini)
 └── frontend/                   # React + Vite Web UI
     ├── Dockerfile
