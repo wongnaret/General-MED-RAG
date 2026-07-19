@@ -1,0 +1,28 @@
+# FastAPI Backend & Server
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+python-multipart>=0.0.9
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+
+# Database Clients
+neo4j>=5.18.0
+qdrant-client>=1.8.0
+
+# Document Ingestion & OCR
+pymupdf>=1.23.26
+easyocr>=1.7.1
+pillow>=10.2.0
+numpy>=1.26.0
+
+# LLM & Embedding Integrations
+openai>=1.14.0
+google-genai>=0.1.1
+networkx>=3.2.0
+pandas>=2.2.0
+openpyxl>=3.1.0
+
+# Utilities
+requests>=2.31.0
+python-dotenv>=1.0.1
+tiktoken>=0.6.0

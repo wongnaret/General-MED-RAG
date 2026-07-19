@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------
+  # Graph Database: Neo4j
+  # ----------------------------------------------------
+  neo4j:
+    image: neo4j:5.18.0
+    container_name: medrag-neo4j
+    ports:
+      - "7474:7474" # Neo4j Browser (HTTP)
+      - "7687:7687" # Bolt Protocol
+    environment:
+      - NEO4J_AUTH=neo4j/medragpassword123 # Default secure credentials
+      - NEO4J_PLUGINS=["apoc", "gds"]     # Enable APOC & GDS procedures
+    volumes:
+      - ./neo4j_data/data:/data
+      - ./neo4j_data/logs:/logs
+      - ./neo4j_data/import:/var/lib/neo4j/import
+      - ./neo4j_data/plugins:/plugins
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------
+  # Vector Database: Qdrant
+  # ----------------------------------------------------
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: medrag-qdrant
+    ports:
+      - "6333:6333" # HTTP API
+      - "6334:6334" # gRPC API
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6333/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------
+  # Backend API: FastAPI (Python Core)
+  # ----------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medrag-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=dev
+      - HOST=0.0.0.0
+      - PORT=8000
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=medragpassword123
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - LLM_PROVIDER=ollama # Options: ollama, vllm, gemini, openai
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434 # Point to local Ollama on host
+      - OPENAI_API_BASE=http://host.docker.internal:11434/v1 # OpenAI compatible API fallback
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - UMLS_API_KEY=${UMLS_API_KEY:-}
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./external:/app/external
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Required to reach host Ollama service from container
+    restart: unless-stopped
+
+  # ----------------------------------------------------
+  # Frontend Dashboard: React (Vite)
+  # ----------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medrag-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Do not map local node_modules over container node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped

@@ -1,0 +1,3 @@
+[submodule "external/Medical-Graph-RAG"]
+	path = external/Medical-Graph-RAG
+	url = https://github.com/ImprintLab/Medical-Graph-RAG.git

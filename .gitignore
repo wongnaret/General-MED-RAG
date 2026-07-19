@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# React / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Databases and Local Storage
+data/
+**/data/
+neo4j_data/
+qdrant_storage/
+
+# System / IDE
+.DS_Store
+.vscode/
+.idea/
+.gemini/
+.agents/
+*.swp
+*.bak
