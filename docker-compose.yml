@@ -19,11 +19,6 @@ services:
       - ./neo4j_data/import:/var/lib/neo4j/import
       - ./neo4j_data/plugins:/plugins
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # ----------------------------------------------------
   # Vector Database: Qdrant
@@ -37,11 +32,6 @@ services:
     volumes:
       - ./qdrant_storage:/qdrant/storage
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:6333/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # ----------------------------------------------------
   # Backend API: FastAPI (Python Core)
@@ -73,10 +63,8 @@ services:
       - ./data:/app/data
       - ./external:/app/external
     depends_on:
-      neo4j:
-        condition: service_healthy
-      qdrant:
-        condition: service_healthy
+      - neo4j
+      - qdrant
     extra_hosts:
       - "host.docker.internal:host-gateway" # Required to reach host Ollama service from container
     restart: unless-stopped
