@@ -103,7 +103,7 @@ We extend our FastAPI ingestion backend and React interface to let the user sele
 When files are uploaded, we reuse `creat_metagraph_with_description` to extract entities, and call `ref_link` to build secure `[:REFERENCE]` associations across levels!
 
 ### 4. Graph Similarity Computing (GDS Plugin)
-We update `NEO4J_PLUGINS` in `docker-compose.yml` to include `gds` (Graph Data Science) along with `apoc`. This supports `gds.similarity.cosine(...)` natively for node-merging queries inside the submodule without any modification!
+We update `NEO4J_PLUGINS` in `docker-compose.yml` to include `graph-data-science` along with `apoc`. This supports `gds.similarity.cosine(...)` natively for node-merging queries inside the submodule without any modification!
 
 ---
 
@@ -200,3 +200,15 @@ UMLS_API_KEY=your_umls_license_api_key_here
     Ensure Ollama is running on your host machine. On Linux, Docker containers access the host network via `http://host.docker.internal:11434`. This is pre-configured in `docker-compose.yml` under `extra_hosts`.
 2.  **Neo4j out of memory**:
     If parsing extremely large medical textbook PDFs (>500 pages), increase container RAM limit or split documents into chapters before uploading.
+
+---
+
+## 📜 Developer Rules & Code Modifications
+
+To maintain system integrity and prevent runtime crashes, all developers and AI coding assistants must strictly adhere to the following guidelines:
+
+1. **Dependency Integrity**: Whenever introducing new imports or editing Python code, verify if any external packages are added. Always update `requirements.txt` immediately with the correct package names and compatible versions.
+2. **Dockerfile & Container Synchronization**: Ensure that changes to system dependencies are reflected in the corresponding service `Dockerfile` or `docker-compose.yml` environments.
+3. **Submodule Safety**: Since the project integrates `Medical-Graph-RAG` as a git submodule, do not directly modify code inside `external/` unless absolutely necessary. If changes are required, document them clearly and consider upstream implications.
+4. **Documentation Alignment**: Any architectural, configuration, database schema, or dependency changes must be documented in this `README.md` and related development notes.
+
