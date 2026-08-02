@@ -684,28 +684,43 @@ export default function App() {
               <button 
                 onClick={() => fetchGraphData(nodeLimit)} 
                 className="glass-panel" 
-                style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.8rem', borderRadius: '8px' }}
+                style={{ 
+                  padding: '8px 16px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  cursor: 'pointer', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 600,
+                  borderRadius: '8px',
+                  background: 'rgba(0, 242, 254, 0.12)',
+                  border: '1px solid rgba(0, 242, 254, 0.5)',
+                  color: '#ffffff',
+                  boxShadow: '0 0 12px rgba(0, 242, 254, 0.15)'
+                }}
                 disabled={graphLoading}
               >
-                <RefreshCw size={14} style={{ animation: graphLoading ? 'spin 2s linear infinite' : 'none' }} />
+                <RefreshCw size={14} style={{ animation: graphLoading ? 'spin 2s linear infinite' : 'none', color: 'var(--primary)' }} />
                 <span>รีเฟรชข้อมูลกราฟ</span>
               </button>
             </div>
 
             {/* Interactive Control Bar */}
-            <div className="glass-panel" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+            <div className="glass-panel" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', background: 'rgba(15, 23, 42, 0.85)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)' }}>
               
               {/* Layout Mode Selector */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Layout Mode:</span>
-                <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', padding: '3px' }}>
+                <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 600 }}>Layout Mode:</span>
+                <div style={{ display: 'flex', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', padding: '4px', gap: '4px', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <button 
                     onClick={() => setLayoutMode('hierarchical')}
                     style={{ 
-                      padding: '4px 10px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                      background: layoutMode === 'hierarchical' ? 'var(--primary)' : 'transparent',
-                      color: layoutMode === 'hierarchical' ? '#000' : 'var(--text-secondary)',
-                      fontWeight: layoutMode === 'hierarchical' ? 600 : 400
+                      padding: '6px 12px', fontSize: '0.78rem', borderRadius: '6px', border: layoutMode === 'hierarchical' ? 'none' : '1px solid rgba(255,255,255,0.15)', cursor: 'pointer',
+                      background: layoutMode === 'hierarchical' ? 'var(--primary)' : 'rgba(255,255,255,0.08)',
+                      color: layoutMode === 'hierarchical' ? '#05050a' : '#f8fafc',
+                      fontWeight: 700,
+                      boxShadow: layoutMode === 'hierarchical' ? '0 0 12px var(--primary-glow)' : 'none',
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     3-Layer Hierarchy
@@ -713,10 +728,12 @@ export default function App() {
                   <button 
                     onClick={() => setLayoutMode('physics')}
                     style={{ 
-                      padding: '4px 10px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                      background: layoutMode === 'physics' ? 'var(--primary)' : 'transparent',
-                      color: layoutMode === 'physics' ? '#000' : 'var(--text-secondary)',
-                      fontWeight: layoutMode === 'physics' ? 600 : 400
+                      padding: '6px 12px', fontSize: '0.78rem', borderRadius: '6px', border: layoutMode === 'physics' ? 'none' : '1px solid rgba(255,255,255,0.15)', cursor: 'pointer',
+                      background: layoutMode === 'physics' ? 'var(--primary)' : 'rgba(255,255,255,0.08)',
+                      color: layoutMode === 'physics' ? '#05050a' : '#f8fafc',
+                      fontWeight: 700,
+                      boxShadow: layoutMode === 'physics' ? '0 0 12px var(--primary-glow)' : 'none',
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     Force Physics
@@ -724,10 +741,12 @@ export default function App() {
                   <button 
                     onClick={() => setLayoutMode('circular')}
                     style={{ 
-                      padding: '4px 10px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                      background: layoutMode === 'circular' ? 'var(--primary)' : 'transparent',
-                      color: layoutMode === 'circular' ? '#000' : 'var(--text-secondary)',
-                      fontWeight: layoutMode === 'circular' ? 600 : 400
+                      padding: '6px 12px', fontSize: '0.78rem', borderRadius: '6px', border: layoutMode === 'circular' ? 'none' : '1px solid rgba(255,255,255,0.15)', cursor: 'pointer',
+                      background: layoutMode === 'circular' ? 'var(--primary)' : 'rgba(255,255,255,0.08)',
+                      color: layoutMode === 'circular' ? '#05050a' : '#f8fafc',
+                      fontWeight: 700,
+                      boxShadow: layoutMode === 'circular' ? '0 0 12px var(--primary-glow)' : 'none',
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     Circular
@@ -737,14 +756,15 @@ export default function App() {
 
               {/* Layer Filters */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Filter Layers:</span>
+                <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 600 }}>Filter Layers:</span>
                 <button 
                   onClick={() => setLayerFilters(prev => ({ ...prev, top: !prev.top }))}
                   style={{
-                    padding: '4px 10px', fontSize: '0.75rem', borderRadius: '12px', cursor: 'pointer',
-                    background: layerFilters.top ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255,255,255,0.02)',
-                    border: layerFilters.top ? '1px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255,255,255,0.1)',
-                    color: layerFilters.top ? '#fff' : 'var(--text-muted)'
+                    padding: '6px 12px', fontSize: '0.78rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700,
+                    background: layerFilters.top ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255,255,255,0.05)',
+                    border: layerFilters.top ? '1px solid #ffffff' : '1px solid rgba(255,255,255,0.2)',
+                    color: layerFilters.top ? '#ffffff' : '#94a3b8',
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   Top (Chunks)
@@ -752,10 +772,11 @@ export default function App() {
                 <button 
                   onClick={() => setLayerFilters(prev => ({ ...prev, middle: !prev.middle }))}
                   style={{
-                    padding: '4px 10px', fontSize: '0.75rem', borderRadius: '12px', cursor: 'pointer',
-                    background: layerFilters.middle ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255,255,255,0.02)',
-                    border: layerFilters.middle ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)',
-                    color: layerFilters.middle ? 'var(--primary)' : 'var(--text-muted)'
+                    padding: '6px 12px', fontSize: '0.78rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700,
+                    background: layerFilters.middle ? 'rgba(0, 242, 254, 0.25)' : 'rgba(255,255,255,0.05)',
+                    border: layerFilters.middle ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.2)',
+                    color: layerFilters.middle ? '#00f2fe' : '#94a3b8',
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   Middle (Entities)
@@ -763,10 +784,11 @@ export default function App() {
                 <button 
                   onClick={() => setLayerFilters(prev => ({ ...prev, bottom: !prev.bottom }))}
                   style={{
-                    padding: '4px 10px', fontSize: '0.75rem', borderRadius: '12px', cursor: 'pointer',
-                    background: layerFilters.bottom ? 'rgba(161, 140, 209, 0.15)' : 'rgba(255,255,255,0.02)',
-                    border: layerFilters.bottom ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.1)',
-                    color: layerFilters.bottom ? 'var(--accent)' : 'var(--text-muted)'
+                    padding: '6px 12px', fontSize: '0.78rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700,
+                    background: layerFilters.bottom ? 'rgba(161, 140, 209, 0.25)' : 'rgba(255,255,255,0.05)',
+                    border: layerFilters.bottom ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.2)',
+                    color: layerFilters.bottom ? '#c084fc' : '#94a3b8',
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   Bottom (UMLS)
@@ -775,7 +797,7 @@ export default function App() {
 
               {/* Node Limit Slider */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Limit: {nodeLimit}</span>
+                <span style={{ fontSize: '0.8rem', color: '#f8fafc', fontWeight: 600 }}>Limit: {nodeLimit}</span>
                 <input 
                   type="range" 
                   min="25" 
@@ -789,25 +811,26 @@ export default function App() {
 
               {/* Live Search Input */}
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <Search size={14} style={{ position: 'absolute', left: '10px', color: 'var(--text-muted)' }} />
+                <Search size={14} style={{ position: 'absolute', left: '10px', color: 'var(--primary)' }} />
                 <input 
                   type="text" 
                   placeholder="ค้นหาโหนดคีย์เวิร์ด..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
-                    padding: '5px 10px 5px 30px',
-                    fontSize: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    background: 'rgba(0,0,0,0.4)',
-                    color: '#fff',
-                    width: '150px'
+                    padding: '6px 10px 6px 32px',
+                    fontSize: '0.78rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0, 242, 254, 0.4)',
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    color: '#ffffff',
+                    width: '160px',
+                    outline: 'none'
                   }}
                 />
                 {searchQuery && (
                   <X 
-                    size={12} 
+                    size={14} 
                     onClick={() => setSearchQuery('')} 
                     style={{ position: 'absolute', right: '8px', cursor: 'pointer', color: 'var(--text-muted)' }} 
                   />

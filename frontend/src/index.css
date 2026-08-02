@@ -533,7 +533,22 @@ h1, h2, h3, h4, h5, h6 {
   animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Vis-Network Custom Navigation Controls */
+.vis-navigation .vis-button {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(0, 242, 254, 0.6) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  transition: all 0.2s ease !important;
+}
+
+.vis-navigation .vis-button:hover {
+  background-color: rgba(0, 242, 254, 0.3) !important;
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 16px var(--primary-glow) !important;
+  transform: scale(1.08);
+}
+
+.vis-navigation .vis-button:after {
+  filter: invert(1) brightness(2.5) !important; /* Makes arrows high-contrast bright white */
 }
