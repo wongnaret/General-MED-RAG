@@ -1,0 +1,39 @@
+================================================================================
+LAYER: TOP (PATIENT CASE REPORTS & CLINICAL HISTORY)
+CASE ID: CASE-2026-T2DM-01
+================================================================================
+
+---
+PATIENT PROFILE
+Name: John Doe
+Age: 56
+Gender: Male
+History: 10-year history of Type 2 Diabetes Mellitus (T2DM) and a 5-year history of Hypertension. No history of coronary artery disease.
+---
+
+---
+PRESENTING CLINICAL STATUS
+The patient presents for a routine chronic disease management review. He complains of moderate fatigue over the last 2 months and mild bilateral ankle edema in the evenings. He denies any chest pain, dyspnea on exertion, or severe hypoglycemia episodes.
+- Vital Signs: Blood Pressure: 138/84 mmHg, Heart Rate: 72 bpm, BMI: 28.5 kg/m2.
+- Current Active Medication:
+  - Metformin 1000 mg twice daily (total daily dose 2000 mg).
+  - Lisinopril 10 mg once daily.
+---
+
+---
+LABORATORY RESULTS (COMPLETED TODAY)
+- Glycated Hemoglobin (HbA1c): 8.2% (Indicating suboptimal glycemic control; previous result 6 months ago was 7.5%)
+- Serum Creatinine: 1.6 mg/dL (Elevated from baseline of 1.2 mg/dL)
+- Estimated Glomerular Filtration Rate (eGFR): 45 mL/min/1.73m2 (Indicating Stage 3b Chronic Kidney Disease / moderate-to-severe renal impairment)
+- Urine Albumin-to-Creatinine Ratio (UACR): 150 mg/g (Indicating persistent microalbuminuria / moderately increased albuminuria)
+---
+
+---
+CLINICAL ASSESSMENT & CLINICAL DECISION-MAKING
+1. The patient's Type 2 Diabetes is currently poorly controlled (HbA1c 8.2% vs target < 7.0%).
+2. The patient has developed early signs of Diabetic Nephropathy, evidenced by moderately increased albuminuria (UACR 150 mg/g) and a moderate-to-severe decline in renal function (eGFR 45 mL/min/1.73m2).
+3. The current medication regimen must be adjusted:
+   - Metformin dose: Currently at 2000 mg daily. Because the patient's eGFR has declined to 45 mL/min/1.73m2, clinical practice guidelines dictate that Metformin should be limited to a maximum daily dose of 1000 mg to mitigate the risk of lactic acidosis.
+   - Escalation therapy for renal protection: To address the persistent microalbuminuria and suboptimal glycemic control, an SGLT2 inhibitor (e.g., Empagliflozin 10 mg once daily) should be initiated. This will provide significant cardiorenal protection and help slow the progression of diabetic nephropathy.
+   - Hypertension management: Blood pressure is 138/84 mmHg (target is < 130/80 mmHg). Consider uptitrating Lisinopril to 20 mg daily.
+---

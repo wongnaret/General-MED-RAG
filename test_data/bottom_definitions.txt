@@ -1,0 +1,34 @@
+================================================================================
+LAYER: BOTTOM (MEDICAL DEFINITIONS & GLOSSARY TERMS)
+TOPIC: TYPE 2 DIABETES MELLITUS & NEPHROPATHY
+================================================================================
+
+---
+TERM: Type 2 Diabetes Mellitus
+SYNONYMS: T2DM, Non-Insulin Dependent Diabetes, Adult-Onset Diabetes
+DEFINITION: A chronic metabolic disorder characterized by high blood glucose, insulin resistance, and relative lack of insulin. Long-term complications from high blood sugar include heart disease, strokes, diabetic retinopathy which can result in blindness, and kidney failure (diabetic nephropathy).
+---
+
+---
+TERM: Diabetic Nephropathy
+SYNONYMS: Diabetic Kidney Disease, DKD, Glomerulosclerosis
+DEFINITION: A progressive kidney disease caused by angiopathy of capillaries in the kidney glomeruli due to long-standing diabetes mellitus. It is characterized by microalbuminuria (increased urinary albumin excretion) and a progressive decline in glomerular filtration rate (GFR).
+---
+
+---
+TERM: Metformin
+SYNONYMS: Glucophage, Metformin Hydrochloride
+DEFINITION: A first-line oral biguanide antihyperglycemic medication used for the treatment of type 2 diabetes mellitus, particularly in people who are overweight. It works by decreasing hepatic glucose production, decreasing intestinal absorption of glucose, and improving insulin sensitivity by increasing peripheral glucose uptake and utilization.
+---
+
+---
+TERM: Glomerular Filtration Rate
+SYNONYMS: GFR, Estimated GFR, eGFR
+DEFINITION: A test used to check how well the kidneys are working. Specifically, it estimates how much blood passes through the glomeruli each minute. Glomeruli are the tiny filters in the kidneys that filter waste from the blood. GFR is measured in milliliters per minute per 1.73 square meters of body surface area (mL/min/1.73m2).
+---
+
+---
+TERM: Microalbuminuria
+SYNONYMS: Albuminuria, Urine Albumin-to-Creatinine Ratio, UACR
+DEFINITION: An abnormally increased excretion rate of albumin in the urine, typically ranging between 30 and 300 mg/g of creatinine. It is an early clinical indicator of diabetic nephropathy and increased risk of cardiovascular disease in patients with diabetes.
+---

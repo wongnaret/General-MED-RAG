@@ -1,0 +1,28 @@
+================================================================================
+LAYER: MIDDLE (CLINICAL PRACTICE GUIDELINES & PROTOCOLS)
+TOPIC: PHARMACOLOGICAL MANAGEMENT OF TYPE 2 DIABETES & RENAL PROTECTION
+================================================================================
+
+---
+SECTION 1: FIRST-LINE THERAPY (METFORMIN)
+Metformin remains the preferred first-line pharmacological agent for the treatment of Type 2 Diabetes Mellitus (T2DM) in the absence of specific contraindications.
+- Initial dosing: 500 mg once or twice daily, titrated up to a maximum effective dose of 1000 mg twice daily.
+- Renal Adjustment Guidelines:
+  - If eGFR is >= 45 mL/min/1.73m2: No active dose adjustment of Metformin is required, but renal function should be monitored at least annually.
+  - If eGFR is 30 to 44 mL/min/1.73m2: Daily dosage of Metformin should be limited to a maximum of 1000 mg (e.g., 500 mg twice daily). Avoid initiating Metformin in patients within this range. If already taking Metformin, evaluate the benefit-risk ratio and monitor renal function every 3 months.
+  - If eGFR is < 30 mL/min/1.73m2: Metformin is strictly CONTRAINDICATED. Immediate discontinuation is required to prevent metformin-associated lactic acidosis (MALA).
+---
+
+---
+SECTION 2: EARLY DIABETIC NEPHROPATHY PROTOCOLS
+For patients with Type 2 Diabetes and established Diabetic Nephropathy (defined as eGFR < 60 mL/min/1.73m2 and/or Urine Albumin-to-Creatinine Ratio (UACR) >= 30 mg/g):
+- SGLT2 Inhibitors (Sodium-Glucose Cotransporter 2 Inhibitors), such as Empagliflozin or Dapagliflozin, are strongly recommended as first-line add-on therapy.
+- Benefits: SGLT2 inhibitors have been shown to significantly reduce the risk of progressive decline in renal function, end-stage renal disease (ESRD), cardiovascular events, and hospitalization for heart failure, independent of glycemic control.
+- Contraindications: Avoid starting SGLT2 inhibitors if eGFR < 20 mL/min/1.73m2.
+---
+
+---
+SECTION 3: TARGET METRICS FOR CARDIORENAL RISK REDUCTION
+- Glycated Hemoglobin (HbA1c): Target HbA1c < 7.0% for most non-pregnant adults. A less stringent target (e.g., < 8.0%) may be appropriate for patients with long-standing diabetes, history of severe hypoglycemia, or advanced microvascular/macrovascular complications.
+- Blood Pressure Management: Target BP < 130/80 mmHg in diabetic patients with hypertension and microalbuminuria. ACE Inhibitors (e.g., Lisinopril) or ARBs (e.g., Losartan) should be used as first-line antihypertensive agents to provide cardiorenal protection.
+---
