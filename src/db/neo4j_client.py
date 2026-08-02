@@ -96,9 +96,10 @@ class Neo4jClient:
             "relationships": {r["rel_type"]: r["count"] for r in rels_res}
         }
 
-    def fetch_visualization_subgraph(self, limit: int = 100) -> Dict[str, List[Dict[str, Any]]]:
+    def fetch_visualization_subgraph(self, limit: int = 250) -> Dict[str, List[Dict[str, Any]]]:
         """
         Fetches up to LIMIT nodes and relations for interactive UI visualization.
+        Extracts full node properties dictionary to feed the interactive side panel.
         """
         query = f"""
         MATCH (n)-[r]->(m)
@@ -118,19 +119,25 @@ class Neo4jClient:
             # Format source node
             src_id = src.get("id", "unknown")
             if src_id not in nodes_dict:
+                src_props = dict(src)
+                src_name = src_props.get("name") or src_props.get("title") or src_props.get("description") or src_id
                 nodes_dict[src_id] = {
                     "id": src_id,
-                    "label": src.get("name", src_id),
-                    "type": list(src.labels)[0] if hasattr(src, "labels") and src.labels else "Entity"
+                    "label": src_name,
+                    "type": list(src.labels)[0] if hasattr(src, "labels") and src.labels else "Entity",
+                    "properties": src_props
                 }
                 
             # Format target node
             tgt_id = tgt.get("id", "unknown")
             if tgt_id not in nodes_dict:
+                tgt_props = dict(tgt)
+                tgt_name = tgt_props.get("name") or tgt_props.get("title") or tgt_props.get("description") or tgt_id
                 nodes_dict[tgt_id] = {
                     "id": tgt_id,
-                    "label": tgt.get("name", tgt_id),
-                    "type": list(tgt.labels)[0] if hasattr(tgt, "labels") and tgt.labels else "Entity"
+                    "label": tgt_name,
+                    "type": list(tgt.labels)[0] if hasattr(tgt, "labels") and tgt.labels else "Entity",
+                    "properties": tgt_props
                 }
                 
             # Edge
@@ -139,6 +146,30 @@ class Neo4jClient:
                 "target": tgt_id,
                 "type": edge_type
             })
+
+        # Fetch orphan nodes if node limit permits
+        if len(nodes_dict) < limit:
+            orphan_query = f"""
+            MATCH (n)
+            RETURN n
+            LIMIT {limit - len(nodes_dict)}
+            """
+            try:
+                orphan_records = self.execute_query(orphan_query)
+                for record in orphan_records:
+                    node = record["n"]
+                    node_id = node.get("id", "unknown")
+                    if node_id not in nodes_dict:
+                        props = dict(node)
+                        name = props.get("name") or props.get("title") or props.get("description") or node_id
+                        nodes_dict[node_id] = {
+                            "id": node_id,
+                            "label": name,
+                            "type": list(node.labels)[0] if hasattr(node, "labels") and node.labels else "Entity",
+                            "properties": props
+                        }
+            except Exception as e:
+                print(f"[!] Error fetching orphan nodes: {e}")
             
         return {
             "nodes": list(nodes_dict.values()),
