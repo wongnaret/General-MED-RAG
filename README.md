@@ -19,6 +19,37 @@ The system is fully optimized for **on-premises deployment on Linux/WSL**, enabl
 
 ---
 
+## 🛠️ Technology Stack
+
+General-MED-RAG is constructed using enterprise-grade, modern, and production-proven open-source technologies:
+
+### **1. Frontend (Web User Interface)**
+*   **Framework**: [React 18](https://react.dev/) + [Vite](https://vitejs.dev/) (Single Page Application)
+*   **Reverse Proxy**: Built-in Vite Dev Server Proxy routing `/api/*` requests directly to `http://backend:8000` inside the internal Docker bridge network (eliminates CORS and external firewall open-port dependencies).
+*   **Styling**: Vanilla Modern CSS3 with dark-mode glassmorphic aesthetics, dynamic HSL color tokens, and smooth micro-animations.
+*   **Icons & Components**: [Lucide React](https://lucide.dev/) for clinical and system status iconography.
+
+### **2. Backend & Core Engine (Python 3.11)**
+*   **Web Framework**: [FastAPI](https://fastapi.tiangolo.com/) with asynchronous Uvicorn server (`0.0.0.0:8000`).
+*   **RAG Core Baseline**: Custom wrapper around [Medical-Graph-RAG](https://github.com/ImprintLab/Medical-Graph-RAG) implementing the U-Retrieval RAG algorithm.
+*   **Document Ingestion & OCR**: [PyMuPDF](https://pymupdf.readthedocs.io/) for high-speed text extraction, with an offline fallback to [EasyOCR](https://github.com/JaidedAI/EasyOCR) for scanned PDFs and clinical images.
+*   **Dynamic LLM Interceptor**: Built-in monkey-patching layer in `src/config.py` that intercepts all `openai` completions/embeddings and LangChain `ChatOpenAI` calls, mapping legacy hardcoded model names (`gpt-4-1106-preview`, `gpt-4o-mini`) to active local or frontier models.
+
+### **3. Databases & Vector Stores**
+*   **Graph Database**: [Neo4j 5.18.0](https://neo4j.com/) with APOC and Graph Data Science (GDS) procedures, handling the Triple-Linked Trinity Graph (Top/Middle/Bottom layers) via Cypher query language over Bolt protocol (`7687`).
+*   **Vector Database**: [Qdrant](https://qdrant.tech/) storing page-level embeddings for high-speed top-down semantic vector searches (`6333`).
+
+### **4. LLM & Embedding Integrations**
+*   **Local LLMs (On-Premises / Offline)**: [Ollama](https://ollama.com/) (e.g. `llama3:latest`) and [vLLM](https://github.com/vllm-project/vllm) (`Qwen/Qwen2.5-7B-Instruct`).
+*   **Local Embeddings**: `nomic-embed-text` via Ollama or standard HuggingFace embeddings.
+*   **Frontier API LLMs**: Google [Gemini API](https://ai.google.dev/) (`gemini-2.5-flash` with `text-embedding-004`) and [OpenAI API](https://platform.openai.com/) (`gpt-4-turbo`).
+
+### **5. Infrastructure & Containerization**
+*   **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/) orchestrating multi-service containers (`medrag-frontend`, `medrag-backend`, `medrag-neo4j`, `medrag-qdrant`).
+*   **Host Networking**: Configured with `extra_hosts` (`host.docker.internal:host-gateway`) and Linux systemd override (`OLLAMA_HOST=0.0.0.0`) to connect Docker containers directly to host-level Ollama instances.
+
+---
+
 ## 🏗️ Architecture Design & System Flow
 
 The system architecture is structured to support **Dynamic Python Path Injection & Environment Overriding** to fully reuse the original paper's research submodule without codebase duplication.
