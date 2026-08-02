@@ -533,22 +533,34 @@ h1, h2, h3, h4, h5, h6 {
   animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Vis-Network Custom Navigation Controls */
-.vis-navigation .vis-button {
+/* Complete Override for Vis-Network Navigation Controls - NO GREEN SPRITES */
+div.vis-network div.vis-navigation div.vis-button {
+  background-image: none !important;
   background-color: rgba(15, 23, 42, 0.95) !important;
   border: 1px solid rgba(0, 242, 254, 0.6) !important;
   border-radius: 8px !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  color: #00f2fe !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
   transition: all 0.2s ease !important;
 }
 
-.vis-navigation .vis-button:hover {
+div.vis-network div.vis-navigation div.vis-button:hover {
   background-color: rgba(0, 242, 254, 0.3) !important;
   border-color: #00f2fe !important;
   box-shadow: 0 0 16px var(--primary-glow) !important;
-  transform: scale(1.08);
+  color: #ffffff !important;
 }
 
-.vis-navigation .vis-button:after {
-  filter: invert(1) brightness(2.5) !important; /* Makes arrows high-contrast bright white */
-}
+/* Insert crisp, clean Unicode arrow icons */
+div.vis-network div.vis-navigation div.vis-button.vis-up:after { content: "▲"; }
+div.vis-network div.vis-navigation div.vis-button.vis-down:after { content: "▼"; }
+div.vis-network div.vis-navigation div.vis-button.vis-left:after { content: "◄"; }
+div.vis-network div.vis-navigation div.vis-button.vis-right:after { content: "►"; }
+div.vis-network div.vis-navigation div.vis-button.vis-zoomIn:after { content: "＋"; font-size: 16px; }
+div.vis-network div.vis-navigation div.vis-button.vis-zoomOut:after { content: "－"; font-size: 16px; }
+div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends:after { content: "⟌"; font-size: 14px; }
