@@ -165,9 +165,16 @@ def apply_submodule_patches():
     
     if os.path.exists(patch_path) and os.path.exists(os.path.dirname(target_path)):
         try:
-            import shutil
-            shutil.copy2(patch_path, target_path)
-            print(f"[*] Successfully synchronized and applied local-LLM patch to submodule: {target_path}")
+            should_copy = True
+            if os.path.exists(target_path):
+                with open(patch_path, "r", encoding="utf-8") as f1, open(target_path, "r", encoding="utf-8") as f2:
+                    if f1.read() == f2.read():
+                        should_copy = False
+                        
+            if should_copy:
+                import shutil
+                shutil.copy2(patch_path, target_path)
+                print(f"[*] Successfully synchronized and applied local-LLM patch to submodule: {target_path}")
         except Exception as e:
             print(f"[!] Failed to apply data_chunk patch: {e}")
 
