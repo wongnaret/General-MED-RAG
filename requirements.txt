@@ -35,16 +35,17 @@ tiktoken>=0.6.0
 # Submodule Dependencies
 pymilvus>=2.4.0
 milvus-lite>=2.4.0
-unstructured>=0.10.30
-langchain>=0.1.14
-langchain-community>=0.0.31
-langchain-core>=0.1.40
-langchain-text-splitters>=0.0.1
-langchainhub>=0.1.21
-tenacity>=8.2.3
-graspologic>=3.4.1
-scikit-learn>=1.5.1
-scipy>=1.12.0
+unstructured==0.10.30
+langchain==0.1.14
+langchain-community==0.0.31
+langchain-core==0.1.40
+langchain-text-splitters==0.0.1
+langchainhub==0.1.21
+tenacity==8.2.3
+graspologic==3.4.1
+scikit-learn==1.5.1
+scipy==1.12.0
+
 
 
 
