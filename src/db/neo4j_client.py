@@ -99,7 +99,7 @@ class Neo4jClient:
     def fetch_visualization_subgraph(self, limit: int = 250) -> Dict[str, List[Dict[str, Any]]]:
         """
         Fetches up to LIMIT nodes and relations for interactive UI visualization.
-        Extracts full node properties dictionary to feed the interactive side panel.
+        Guarantees all 3 Trinity Layers (Summary/Chunk, Entity, Definition) are included.
         """
         query = f"""
         MATCH (n)-[r]->(m)
@@ -117,26 +117,30 @@ class Neo4jClient:
             edge_type = record["type"]
             
             # Format source node
-            src_id = src.get("id", "unknown")
+            src_id = src.get("id") or src.get("gid") or "unknown"
             if src_id not in nodes_dict:
                 src_props = dict(src)
-                src_name = src_props.get("name") or src_props.get("title") or src_props.get("description") or src_id
+                src_name = src_props.get("name") or src_props.get("title") or src_props.get("document_name") or src_props.get("description") or src_id
+                node_type = list(src.labels)[0] if hasattr(src, "labels") and src.labels else "Entity"
                 nodes_dict[src_id] = {
                     "id": src_id,
                     "label": src_name,
-                    "type": list(src.labels)[0] if hasattr(src, "labels") and src.labels else "Entity",
+                    "type": node_type,
+                    "layer": src_props.get("layer", ""),
                     "properties": src_props
                 }
                 
             # Format target node
-            tgt_id = tgt.get("id", "unknown")
+            tgt_id = tgt.get("id") or tgt.get("gid") or "unknown"
             if tgt_id not in nodes_dict:
                 tgt_props = dict(tgt)
-                tgt_name = tgt_props.get("name") or tgt_props.get("title") or tgt_props.get("description") or tgt_id
+                tgt_name = tgt_props.get("name") or tgt_props.get("title") or tgt_props.get("document_name") or tgt_props.get("description") or tgt_id
+                node_type = list(tgt.labels)[0] if hasattr(tgt, "labels") and tgt.labels else "Entity"
                 nodes_dict[tgt_id] = {
                     "id": tgt_id,
                     "label": tgt_name,
-                    "type": list(tgt.labels)[0] if hasattr(tgt, "labels") and tgt.labels else "Entity",
+                    "type": node_type,
+                    "layer": tgt_props.get("layer", ""),
                     "properties": tgt_props
                 }
                 
@@ -147,29 +151,31 @@ class Neo4jClient:
                 "type": edge_type
             })
 
-        # Fetch orphan nodes if node limit permits
-        if len(nodes_dict) < limit:
-            orphan_query = f"""
-            MATCH (n)
-            RETURN n
-            LIMIT {limit - len(nodes_dict)}
-            """
-            try:
-                orphan_records = self.execute_query(orphan_query)
-                for record in orphan_records:
-                    node = record["n"]
-                    node_id = node.get("id", "unknown")
-                    if node_id not in nodes_dict:
-                        props = dict(node)
-                        name = props.get("name") or props.get("title") or props.get("description") or node_id
-                        nodes_dict[node_id] = {
-                            "id": node_id,
-                            "label": name,
-                            "type": list(node.labels)[0] if hasattr(node, "labels") and node.labels else "Entity",
-                            "properties": props
-                        }
-            except Exception as e:
-                print(f"[!] Error fetching orphan nodes: {e}")
+        # Specifically query Summary (Top Layer) and Definition (Bottom Layer) nodes to guarantee all 3 layers appear!
+        top_bottom_query = f"""
+        MATCH (n)
+        WHERE n:Summary OR n:Chunk OR n:Definition OR n.layer IS NOT NULL
+        RETURN n
+        LIMIT 50
+        """
+        try:
+            tb_records = self.execute_query(top_bottom_query)
+            for record in tb_records:
+                node = record["n"]
+                node_id = node.get("id") or node.get("gid") or "unknown"
+                if node_id not in nodes_dict:
+                    props = dict(node)
+                    name = props.get("name") or props.get("title") or props.get("document_name") or props.get("description") or node_id
+                    node_type = list(node.labels)[0] if hasattr(node, "labels") and node.labels else "Summary"
+                    nodes_dict[node_id] = {
+                        "id": node_id,
+                        "label": name,
+                        "type": node_type,
+                        "layer": props.get("layer", ""),
+                        "properties": props
+                    }
+        except Exception as e:
+            print(f"[!] Error fetching Top/Bottom layer nodes: {e}")
             
         return {
             "nodes": list(nodes_dict.values()),

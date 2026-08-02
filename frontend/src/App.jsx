@@ -124,9 +124,9 @@ export default function App() {
 
     // Filter nodes based on layerFilters and searchQuery
     const filteredNodes = graphData.nodes.filter(node => {
-      const isTop = node.type === 'Chunk' || node.type === 'Summary';
-      const isMiddle = node.type === 'Entity';
-      const isBottom = node.type === 'Definition';
+      const isTop = node.type === 'Chunk' || node.type === 'Summary' || node.layer === 'top' || node.properties?.layer === 'top';
+      const isBottom = node.type === 'Definition' || node.layer === 'bottom' || node.properties?.layer === 'bottom';
+      const isMiddle = !isTop && !isBottom;
 
       if (isTop && !layerFilters.top) return false;
       if (isMiddle && !layerFilters.middle) return false;
@@ -151,35 +151,26 @@ export default function App() {
     // Format Vis-Network nodes
     const visNodes = new DataSet(
       filteredNodes.map((node) => {
-        const isSummary = node.type === 'Summary';
-        const isChunk = node.type === 'Chunk';
-        const isEntity = node.type === 'Entity';
-        const isDefinition = node.type === 'Definition';
+        const isTop = node.type === 'Chunk' || node.type === 'Summary' || node.layer === 'top' || node.properties?.layer === 'top';
+        const isBottom = node.type === 'Definition' || node.layer === 'bottom' || node.properties?.layer === 'bottom';
+        const isMiddle = !isTop && !isBottom;
+        const isSummary = node.type === 'Summary' || node.properties?.gid !== undefined;
 
         let color = { background: '#1e293b', border: '#475569', highlight: { background: '#334155', border: '#38bdf8' } };
         let shape = 'dot';
         let size = 20;
         let level = 2;
 
-        if (isSummary || isChunk) {
+        if (isTop) {
           level = 1;
-          size = isSummary ? 26 : 22;
+          size = isSummary ? 28 : 22;
           shape = 'box';
           color = {
             background: isSummary ? '#3b1700' : '#1e1e24',
             border: isSummary ? '#e65c00' : '#8888a0',
             highlight: { background: '#4e1f00', border: '#ff8000' }
           };
-        } else if (isEntity) {
-          level = 2;
-          size = 24;
-          shape = 'dot';
-          color = {
-            background: '#042f2e',
-            border: '#00f2fe',
-            highlight: { background: '#085354', border: '#38bdf8' }
-          };
-        } else if (isDefinition) {
+        } else if (isBottom) {
           level = 3;
           size = 20;
           shape = 'diamond';
@@ -187,6 +178,16 @@ export default function App() {
             background: '#2e1065',
             border: '#a18cd1',
             highlight: { background: '#4c1d95', border: '#c084fc' }
+          };
+        } else {
+          // Middle Level (Clinical Entities/Symptoms/Drugs/Diseases)
+          level = 2;
+          size = 24;
+          shape = 'dot';
+          color = {
+            background: '#042f2e',
+            border: '#00f2fe',
+            highlight: { background: '#085354', border: '#38bdf8' }
           };
         }
 
@@ -455,6 +456,22 @@ export default function App() {
               {activeTab === 'ingest' && ' offline parser using local EasyOCR for secure, air-gapped data uploads'}
               {activeTab === 'graph' && ' live structural visualization of Triple-Linked Medical Nodes'}
             </p>
+          </div>
+
+          {/* Database & LLM Status Badges */}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <div className="glass-panel" style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
+              <Database size={14} style={{ color: status.databases?.neo4j === 'Connected' ? 'var(--primary)' : 'var(--danger)' }} />
+              <span>Neo4j: <strong style={{ color: status.databases?.neo4j === 'Connected' ? 'var(--primary)' : 'var(--danger)' }}>{status.databases?.neo4j || 'Offline'}</strong></span>
+            </div>
+            <div className="glass-panel" style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
+              <Database size={14} style={{ color: status.databases?.qdrant === 'Connected' ? 'var(--primary)' : 'var(--danger)' }} />
+              <span>Qdrant: <strong style={{ color: status.databases?.qdrant === 'Connected' ? 'var(--primary)' : 'var(--danger)' }}>{status.databases?.qdrant || 'Offline'}</strong></span>
+            </div>
+            <div className="glass-panel" style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', color: 'var(--success)' }}>
+              <Cpu size={14} />
+              <span>LLM: <strong>{status.system_config?.llm_provider?.toUpperCase() || 'OLLAMA'}</strong></span>
+            </div>
           </div>
         </header>
 
