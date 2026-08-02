@@ -83,6 +83,82 @@ def apply_submodule_env_overrides():
 
 apply_submodule_env_overrides()
 
+def apply_model_patches():
+    provider = settings.LLM_PROVIDER.lower()
+    
+    # Define target models based on provider
+    if provider == "gemini":
+        chat_model = settings.GEMINI_MODEL # gemini-2.5-flash
+        embed_model = "text-embedding-004"
+    elif provider == "ollama":
+        chat_model = settings.OLLAMA_MODEL # llama3:latest
+        embed_model = "nomic-embed-text"
+    elif provider == "vllm":
+        chat_model = settings.VLLM_MODEL
+        embed_model = "text-embedding-3-small" # fallback or user specific
+    else:
+        # For standard openai provider, keep original
+        return
+
+    # Patch OpenAI package (both Sync and Async clients)
+    try:
+        import openai
+        
+        # Patch chat completions create
+        original_chat_create = openai.resources.chat.completions.Completions.create
+        def patched_chat_create(self, *args, **kwargs):
+            if "model" in kwargs:
+                kwargs["model"] = chat_model
+            return original_chat_create(self, *args, **kwargs)
+        openai.resources.chat.completions.Completions.create = patched_chat_create
+
+        original_async_chat_create = openai.resources.chat.completions.AsyncCompletions.create
+        async def patched_async_chat_create(self, *args, **kwargs):
+            if "model" in kwargs:
+                kwargs["model"] = chat_model
+            return await original_async_chat_create(self, *args, **kwargs)
+        openai.resources.chat.completions.AsyncCompletions.create = patched_async_chat_create
+
+        # Patch embeddings create
+        original_embed_create = openai.resources.embeddings.Embeddings.create
+        def patched_embed_create(self, *args, **kwargs):
+            if "model" in kwargs:
+                kwargs["model"] = embed_model
+            return original_embed_create(self, *args, **kwargs)
+        openai.resources.embeddings.Embeddings.create = patched_embed_create
+
+        original_async_embed_create = openai.resources.embeddings.AsyncEmbeddings.create
+        async def patched_async_embed_create(self, *args, **kwargs):
+            if "model" in kwargs:
+                kwargs["model"] = embed_model
+            return await original_async_embed_create(self, *args, **kwargs)
+        openai.resources.embeddings.AsyncEmbeddings.create = patched_async_embed_create
+        
+        print(f"[*] Patched OpenAI client model routing to: chat={chat_model}, embed={embed_model}")
+    except Exception as e:
+        print(f"[!] Failed to patch openai package: {e}")
+
+    # Patch LangChain's ChatOpenAI
+    try:
+        from langchain_community.chat_models import ChatOpenAI
+        original_lc_init = ChatOpenAI.__init__
+        def patched_lc_init(self, *args, **kwargs):
+            if "model" in kwargs:
+                kwargs["model"] = chat_model
+            elif "model_name" in kwargs:
+                kwargs["model_name"] = chat_model
+            else:
+                kwargs["model"] = chat_model
+            original_lc_init(self, *args, **kwargs)
+        ChatOpenAI.__init__ = patched_lc_init
+        print(f"[*] Patched LangChain ChatOpenAI constructor to default to: {chat_model}")
+    except Exception as e:
+        print(f"[!] Failed to patch langchain ChatOpenAI: {e}")
+
+# Apply patches immediately
+apply_model_patches()
+
 # Ensure directories exist
 os.makedirs(settings.DATA_INPUT_DIR, exist_ok=True)
 os.makedirs(settings.DATA_PROCESSED_DIR, exist_ok=True)
+
