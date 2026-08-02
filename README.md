@@ -160,6 +160,21 @@ ollama pull llama3:latest
 ollama pull nomic-embed-text
 ```
 
+> [!IMPORTANT]
+> **Linux Ollama Host Binding for Docker Containers:**
+> By default, Ollama on Linux binds only to `127.0.0.1:11434`, preventing Docker containers from reaching it. You **MUST** configure Ollama to listen on all network interfaces (`0.0.0.0`):
+> 1. Create a systemd service override:
+>    ```bash
+>    sudo mkdir -p /etc/systemd/system/ollama.service.d
+>    echo -e "[Service]\nEnvironment=\"OLLAMA_HOST=0.0.0.0\"" | sudo tee /etc/systemd/system/ollama.service.d/override.conf
+>    ```
+> 2. Reload systemd and restart Ollama:
+>    ```bash
+>    sudo systemctl daemon-reload
+>    sudo systemctl restart ollama
+>    ```
+
+
 ### Step 3: Launch Databases & App Containers
 General-MED-RAG uses Docker-Compose to orchestrate services:
 *   **Neo4j** (Graph Database): Stores the hierarchical medical entity-relation graph.
@@ -196,8 +211,10 @@ UMLS_API_KEY=your_umls_license_api_key_here
 
 ## ⚠️ Troubleshooting
 
-1.  **Backend cannot reach Ollama**:
-    Ensure Ollama is running on your host machine. On Linux, Docker containers access the host network via `http://host.docker.internal:11434`. This is pre-configured in `docker-compose.yml` under `extra_hosts`.
+1.  **Backend cannot reach Ollama (Connection error / `openai.APIConnectionError`)**:
+    * Ensure Ollama is running on your host machine.
+    * On Linux, Docker containers access the host network via `http://host.docker.internal:11434` (pre-configured in `docker-compose.yml` under `extra_hosts`).
+    * **CRITICAL**: If you receive a Connection Error, ensure Ollama's host environment variable is configured to listen on all interfaces (`OLLAMA_HOST=0.0.0.0`). See the systemd override configuration in **Step 2** to fix this immediately.
 2.  **Neo4j out of memory**:
     If parsing extremely large medical textbook PDFs (>500 pages), increase container RAM limit or split documents into chapters before uploading.
 
