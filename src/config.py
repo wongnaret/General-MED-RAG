@@ -158,7 +158,24 @@ def apply_model_patches():
 # Apply patches immediately
 apply_model_patches()
 
+def apply_submodule_patches():
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_path = os.path.join(base_dir, "external", "Medical-Graph-RAG", "data_chunk.py")
+    patch_path = os.path.join(base_dir, "src", "patches", "data_chunk.py")
+    
+    if os.path.exists(patch_path) and os.path.exists(os.path.dirname(target_path)):
+        try:
+            import shutil
+            shutil.copy2(patch_path, target_path)
+            print(f"[*] Successfully synchronized and applied local-LLM patch to submodule: {target_path}")
+        except Exception as e:
+            print(f"[!] Failed to apply data_chunk patch: {e}")
+
+# Apply submodule patches
+apply_submodule_patches()
+
 # Ensure directories exist
 os.makedirs(settings.DATA_INPUT_DIR, exist_ok=True)
 os.makedirs(settings.DATA_PROCESSED_DIR, exist_ok=True)
+
 
