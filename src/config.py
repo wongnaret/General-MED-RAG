@@ -160,23 +160,26 @@ apply_model_patches()
 
 def apply_submodule_patches():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    target_path = os.path.join(base_dir, "external", "Medical-Graph-RAG", "data_chunk.py")
-    patch_path = os.path.join(base_dir, "src", "patches", "data_chunk.py")
+    patches = [
+        ("data_chunk.py", os.path.join(base_dir, "external", "Medical-Graph-RAG", "data_chunk.py"), os.path.join(base_dir, "src", "patches", "data_chunk.py")),
+        ("agentic_chunker.py", os.path.join(base_dir, "external", "Medical-Graph-RAG", "agentic_chunker.py"), os.path.join(base_dir, "src", "patches", "agentic_chunker.py")),
+    ]
     
-    if os.path.exists(patch_path) and os.path.exists(os.path.dirname(target_path)):
-        try:
-            should_copy = True
-            if os.path.exists(target_path):
-                with open(patch_path, "r", encoding="utf-8") as f1, open(target_path, "r", encoding="utf-8") as f2:
-                    if f1.read() == f2.read():
-                        should_copy = False
-                        
-            if should_copy:
-                import shutil
-                shutil.copy2(patch_path, target_path)
-                print(f"[*] Successfully synchronized and applied local-LLM patch to submodule: {target_path}")
-        except Exception as e:
-            print(f"[!] Failed to apply data_chunk patch: {e}")
+    for filename, target_path, patch_path in patches:
+        if os.path.exists(patch_path) and os.path.exists(os.path.dirname(target_path)):
+            try:
+                should_copy = True
+                if os.path.exists(target_path):
+                    with open(patch_path, "r", encoding="utf-8") as f1, open(target_path, "r", encoding="utf-8") as f2:
+                        if f1.read() == f2.read():
+                            should_copy = False
+                            
+                if should_copy:
+                    import shutil
+                    shutil.copy2(patch_path, target_path)
+                    print(f"[*] Successfully synchronized and applied local-LLM patch to submodule ({filename}): {target_path}")
+            except Exception as e:
+                print(f"[!] Failed to apply {filename} patch: {e}")
 
 # Apply submodule patches
 apply_submodule_patches()
