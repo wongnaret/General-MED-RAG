@@ -19,7 +19,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-const API_BASE = `http://${window.location.hostname}:8000`;
+const API_BASE = '';
 
 export default function App() {
   // Navigation & UI State
