@@ -19,6 +19,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 
+const API_BASE = `http://${window.location.hostname}:8000`;
+
 export default function App() {
   // Navigation & UI State
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'ingest' | 'graph'
@@ -64,7 +66,7 @@ export default function App() {
 
   const fetchStatus = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/status');
+      const res = await fetch(`${API_BASE}/api/status`);
       if (res.ok) {
         const data = await res.json();
         setStatus(data);
@@ -79,7 +81,7 @@ export default function App() {
   const fetchGraphData = async () => {
     setGraphLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/api/visualization?limit=100');
+      const res = await fetch(`${API_BASE}/api/visualization?limit=100`);
       if (res.ok) {
         const data = await res.json();
         setGraphData(data);
@@ -102,7 +104,7 @@ export default function App() {
     setChatLoading(true);
     
     try {
-      const res = await fetch('http://localhost:8000/api/query', {
+      const res = await fetch(`${API_BASE}/api/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: userQuery })
@@ -159,7 +161,7 @@ export default function App() {
     formData.append('layer', selectedLayer);
     
     try {
-      const res = await fetch('http://localhost:8000/api/ingest', {
+      const res = await fetch(`${API_BASE}/api/ingest`, {
         method: 'POST',
         body: formData
       });
